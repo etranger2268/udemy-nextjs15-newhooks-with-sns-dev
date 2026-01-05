@@ -9,6 +9,7 @@
 - [React](https://ja.react.dev/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Biome](https://biomejs.dev/)
+- [shadcn](https://ui.shadcn.com/)
 
 ## 開発
 

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter, Noto_Sans_JP } from 'next/font/google';
 import './globals.css';
+import Header from '@/components/component/Header';
 
 type Props = Readonly<{
   children: React.ReactNode;
@@ -25,9 +26,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Props) {
   return (
-    <html lang="ja">
-      <body className={`${inter.variable} ${notoSansJP.variable} antialiased font-sans`}>
-        {children}
+    <html lang="ja" className="h-full">
+      <body className={`${inter.variable} ${notoSansJP.variable} antialiased font-sans flex flex-col h-full`}>
+        <Header />
+        <main className="flex-1">{children}</main>
       </body>
     </html>
   );
