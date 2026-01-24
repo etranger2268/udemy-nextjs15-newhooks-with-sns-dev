@@ -1,23 +1,12 @@
+import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
-import { Inter, Noto_Sans_JP } from 'next/font/google';
-import './globals.css';
+import { inter, notoSansJP } from '@/lib/font';
+import '@/app/globals.css';
 import Header from '@/components/component/Header';
 
 type Props = Readonly<{
   children: React.ReactNode;
 }>;
-
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-});
-
-const notoSansJP = Noto_Sans_JP({
-  subsets: ['latin'],
-  variable: '--font-noto-sans-jp',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   title: 'udemy-nextjs15-newhooks-with-sns-dev',
@@ -26,13 +15,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Props) {
   return (
-    <html lang="ja" className="h-full">
-      <body
-        className={`${inter.variable} ${notoSansJP.variable} antialiased font-sans flex flex-col h-full`}
-      >
-        <Header />
-        <main className="flex-1">{children}</main>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="ja" className="h-full">
+        <body
+          className={`${inter.variable} ${notoSansJP.variable} antialiased font-sans flex flex-col h-full`}
+        >
+          <Header />
+          <main className="flex-1">{children}</main>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
