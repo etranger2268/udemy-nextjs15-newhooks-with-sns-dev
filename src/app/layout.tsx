@@ -17,11 +17,11 @@ export default function RootLayout({ children }: Props) {
   return (
     <ClerkProvider>
       <html lang="ja" className="h-full">
-        <body
-          className={`${inter.variable} ${notoSansJP.variable} antialiased font-sans flex flex-col h-full`}
-        >
-          <Header />
-          <main className="flex-1">{children}</main>
+        <body className={`${inter.variable} ${notoSansJP.variable} antialiased font-sans`}>
+          <div className="min-h-screen flex flex-col">
+            <Header />
+            <main className="flex-1 flex flex-col">{children}</main>
+          </div>
         </body>
       </html>
     </ClerkProvider>
