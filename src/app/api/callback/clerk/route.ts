@@ -7,31 +7,31 @@ export async function POST(req: NextRequest) {
     const evt = await verifyWebhook(req);
     const eventType = evt.type;
 
-    // Do something with payload
-    // For this guide, log payload to console
-
-    if (eventType === 'user.created') {
+    if (eventType === 'user.created' || eventType === 'user.updated') {
       try {
-        const { id, email_addresses, username, image_url } = evt.data;
-        const email = email_addresses?.[0]?.email_address;
+        const { id, last_name, first_name, image_url } = evt.data;
+        const fullname = `${last_name} ${first_name}`;
 
-        if (!id || !email) {
+        if (!id) {
           throw new Error();
         }
 
-        await prisma.user.create({
-          data: {
+        await prisma.user.upsert({
+          where: { clerkId: id },
+          update: {
+            username: fullname,
+            image: image_url,
+          },
+          create: {
             clerkId: id,
-            email: email,
-            username: username ?? email.split('@')[0] ?? id,
-            name: username || 'Unknown',
+            username: fullname,
             image: image_url,
           },
         });
-        return NextResponse.json({ message: 'ユーザーの作成に成功しました' });
+        return NextResponse.json({ message: 'User synced successfully' });
       } catch (error) {
         console.error('Create User ERROR:', error);
-        return NextResponse.json({ message: 'ユーザーの作成に失敗しました' }, { status: 500 });
+        return NextResponse.json({ message: 'Error syncing user' }, { status: 500 });
       }
     }
 
