@@ -1,5 +1,6 @@
 'use client';
 
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { BellIcon, LogInIcon, MailIcon, SearchIcon } from './Icons';
@@ -24,9 +25,16 @@ export default function Header() {
             <MailIcon className="h-6 w-6 text-muted-foreground" />
           </Link>
 
-          <Link href="#" className="flex items-center gap-2" prefetch={false}>
-            <div></div>
-          </Link>
+          <div>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
+            <SignedOut>
+              <Link href="/sign-in" className="text-sm font-medium inline-block w-15">
+                Sign In
+              </Link>
+            </SignedOut>
+          </div>
         </div>
       </div>
     </header>
