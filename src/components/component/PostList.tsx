@@ -2,30 +2,11 @@ import { auth } from '@clerk/nextjs/server';
 import { Suspense } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { prisma } from '@/lib/prisma';
+import { postDataFetcher } from '@/lib/postDataFetcher';
+import { postUserFetcher } from '@/lib/postUserFetcher';
 import { ClockIcon, HeartIcon, MessageCircleIcon, Share2Icon } from './Icons';
 
 export default async function PostList() {
-  // const posts = [
-  //   {
-  //     id: 1,
-  //     author: { name: 'Jane Doe', username: '@janedoe' },
-  //     content:
-  //       'Excited to share my latest project with you all! Check it out and let me know what you think.',
-  //     timestamp: '2h',
-  //     comments: [
-  //       { author: 'John Doe', content: 'Great work!' },
-  //       { author: 'Jane Doe', content: 'Looks amazing!' },
-  //     ],
-  //   },
-  //   {
-  //     id: 2,
-  //     author: { name: 'John Smith', username: '@johnsmith' },
-  //     content: 'Enjoying the beautiful weather today! Whos up for a hike later?',
-  //     timestamp: '1h',
-  //   },
-  // ];
-
   return (
     <div className="space-y-4">
       <Suspense fallback={<p>Loading...</p>}>
@@ -42,11 +23,7 @@ async function PostListContent() {
     return <p className="text-sm font-medium text-center text-gray-500">ログインしてください</p>;
   }
 
-  const user = await prisma.user.findUnique({
-    where: {
-      clerkId: clerkId,
-    },
-  });
+  const user = await postUserFetcher(clerkId);
 
   if (!user) {
     return (
@@ -54,29 +31,7 @@ async function PostListContent() {
     );
   }
 
-  const posts = await prisma.post.findMany({
-    where: {
-      authorId: {
-        in: [user.id],
-      },
-    },
-    include: {
-      author: true,
-      likes: {
-        select: {
-          userId: true,
-        },
-      },
-      _count: {
-        select: {
-          replies: true,
-        },
-      },
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
+  const posts = await postDataFetcher(user);
 
   if (posts.length === 0) {
     return <p className="text-sm font-medium text-center text-gray-500">ログインしてください</p>;
@@ -112,8 +67,8 @@ async function PostListContent() {
               </Button>
             </div>
             <div className="flex items-center gap-2 text-muted-foreground">
-              <ClockIcon className="h-5 w-5" />
-              <span>{post.createdAt.toLocaleString()}</span>
+              <ClockIcon className="size-3" />
+              <span className="text-xs">{post.createdAt.toLocaleString()}</span>
             </div>
           </div>
           {/* {post.comments && (
