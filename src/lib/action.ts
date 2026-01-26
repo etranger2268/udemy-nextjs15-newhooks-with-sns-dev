@@ -1,3 +1,5 @@
+'use server';
+
 import { auth } from '@clerk/nextjs/server';
 import { revalidatePath } from 'next/cache';
 import z from 'zod';
@@ -9,7 +11,6 @@ type State = {
 };
 
 export const addPostAction = async (prevState: State, formData: FormData) => {
-  'use server';
   const { userId: clerkId } = await auth();
 
   if (!clerkId) {

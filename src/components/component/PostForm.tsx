@@ -1,10 +1,10 @@
 'use client';
 
-import { Suspense, useActionState } from 'react';
-import { addPostAction } from '@/action/action';
+import { Fragment, Suspense, useActionState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { addPostAction } from '@/lib/action';
 import { SendIcon } from './Icons';
 
 export default function PostForm() {
@@ -25,17 +25,25 @@ function PostFormContent() {
   const initialState = { error: '', success: true };
   const [state, formAction, isPending] = useActionState(addPostAction, initialState);
   return (
-    <form action={formAction} className="flex items-center flex-1">
-      <Input
-        type="text"
-        placeholder="What's on your mind?"
-        className="flex-1 rounded-full bg-muted px-4 py-2"
-        name="post"
-      />
-      <Button variant="ghost" size="icon">
-        <SendIcon className="h-5 w-5 text-muted-foreground" />
-        <span className="sr-only">Tweet</span>
-      </Button>
-    </form>
+    <Fragment>
+      <form action={formAction} className="flex items-center flex-1">
+        <Input
+          type="text"
+          placeholder="What's on your mind?"
+          className="flex-1 rounded-full bg-muted px-4 py-2"
+          name="post"
+        />
+        <Button
+          variant="ghost"
+          size="icon"
+          disabled={isPending}
+          className="disabled:cursor-not-allowed"
+        >
+          <SendIcon className="h-5 w-5 text-muted-foreground" />
+          <span className="sr-only">Tweet</span>
+        </Button>
+      </form>
+      {state.error && !state.success && <p className="text-red-500 mt-1 ml-14">{state.error}</p>}
+    </Fragment>
   );
 }
