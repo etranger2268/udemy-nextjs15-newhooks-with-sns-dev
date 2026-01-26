@@ -92,8 +92,8 @@ async function PostListContent() {
               <AvatarFallback>AC</AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="text-lg font-bold">{post.author.name}</h3>
-              <p className="text-muted-foreground">{post.author.username}</p>
+              <h3 className="text-lg font-bold">{post.author.username}</h3>
+              <p className="text-muted-foreground text-xs">{post.author.id}</p>
             </div>
           </div>
           <div className="space-y-2">
