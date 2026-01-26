@@ -1,9 +1,10 @@
-import { auth } from '@clerk/nextjs/server';
-import { Suspense } from 'react';
+'use client';
+
+import { Suspense, useActionState } from 'react';
+import { addPostAction } from '@/action/action';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { prisma } from '@/lib/prisma';
 import { SendIcon } from './Icons';
 
 export default function PostForm() {
@@ -20,42 +21,11 @@ export default function PostForm() {
   );
 }
 
-async function PostFormContent() {
-  const { userId: clerkId } = await auth();
-
-  const addPostAction = async (formData: FormData) => {
-    'use server';
-
-    if (!clerkId) {
-      console.error('NOT Signin USER');
-      return;
-    }
-
-    const dbUser = await prisma.user.findUnique({
-      where: { clerkId: clerkId },
-    });
-
-    if (!dbUser) {
-      console.error('Find User ERROR');
-      return;
-    }
-
-    const postText = formData.get('post') as string;
-
-    try {
-      await prisma.post.create({
-        data: {
-          content: postText,
-          authorId: dbUser.id,
-        },
-      });
-    } catch (error) {
-      console.error('Create Post ERROR:', error);
-    }
-  };
-
+function PostFormContent() {
+  const initialState = { error: '', success: true };
+  const [state, formAction, isPending] = useActionState(addPostAction, initialState);
   return (
-    <form action={addPostAction} className="flex items-center flex-1">
+    <form action={formAction} className="flex items-center flex-1">
       <Input
         type="text"
         placeholder="What's on your mind?"
