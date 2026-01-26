@@ -14,7 +14,7 @@ export const addPostAction = async (prevState: State, formData: FormData) => {
   const { userId: clerkId } = await auth();
 
   if (!clerkId) {
-    return { error: 'Need to Sign in', success: false };
+    return { ...prevState, error: 'Need to Sign in', success: false };
   }
 
   const dbUser = await prisma.user.findUnique({
@@ -22,7 +22,7 @@ export const addPostAction = async (prevState: State, formData: FormData) => {
   });
 
   if (!dbUser) {
-    return { error: 'User data not found', success: false };
+    return { ...prevState, error: 'User data not found', success: false };
   }
 
   try {
@@ -44,16 +44,19 @@ export const addPostAction = async (prevState: State, formData: FormData) => {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return {
+        ...prevState,
         error: error.issues.map((e) => e.message).join(','),
         success: false,
       };
     } else if (error instanceof Error) {
       return {
+        ...prevState,
         error: error.message,
         success: false,
       };
     } else {
       return {
+        ...prevState,
         error: 'Unknown Error:',
         success: false,
       };
