@@ -11,6 +11,7 @@ type State = {
 };
 
 export const addPostAction = async (prevState: State, formData: FormData) => {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
   const { userId: clerkId } = await auth();
 
   if (!clerkId) {

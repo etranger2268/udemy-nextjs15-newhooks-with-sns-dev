@@ -33,12 +33,7 @@ function PostFormContent() {
               className="flex-1 rounded-full bg-muted px-4 py-2"
               name="post"
             />
-            <Button
-              variant="ghost"
-              size="icon"
-              disabled={isPending}
-              className="disabled:cursor-not-allowed"
-            >
+            <Button variant="ghost" size="icon" disabled={isPending}>
               <SendIcon className="h-5 w-5 text-muted-foreground" />
               <span className="sr-only">Tweet</span>
             </Button>
