@@ -20,6 +20,7 @@ export const addPostAction = async (prevState: State, formData: FormData) => {
 
   const dbUser = await prisma.user.findUnique({
     where: { clerkId: clerkId },
+    select: { id: true },
   });
 
   if (!dbUser) {

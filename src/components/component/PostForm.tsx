@@ -4,7 +4,7 @@ import { Fragment, Suspense, useActionState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { addPostAction } from '@/lib/action';
+import { addPostAction } from '@/lib/addPostAction';
 import { SendIcon } from './Icons';
 
 export default function PostForm() {
