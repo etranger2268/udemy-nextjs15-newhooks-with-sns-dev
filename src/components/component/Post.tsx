@@ -3,7 +3,30 @@ import { ClockIcon } from '@/components/component/Icons';
 import PostInteraction from '@/components/component/PostInteraction';
 
 type PostProps = {
-  post: any;
+  post: {
+    author: {
+      id: string;
+      username: string;
+      createdAt: Date;
+      image: string | null;
+      name: string | null;
+      clerkId: string;
+      bio: string | null;
+      updatedAt: Date;
+    };
+    likes: {
+      userId: string;
+    }[];
+    _count: {
+      replies: number;
+    };
+  } & {
+    id: string;
+    content: string;
+    createdAt: Date;
+    updatedAt: Date;
+    authorId: string;
+  };
   userId: string;
 };
 
@@ -12,7 +35,7 @@ const Post = ({ post, userId }: PostProps) => {
     <div key={post.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
       <div className="flex items-center gap-4 mb-4">
         <Avatar className="w-10 h-10">
-          <AvatarImage src="/placeholder-user.jpg" />
+          <AvatarImage src={post.author?.image ?? '/placeholder-user.jpg'} />
           <AvatarFallback>AC</AvatarFallback>
         </Avatar>
         <div>
@@ -28,7 +51,7 @@ const Post = ({ post, userId }: PostProps) => {
           <PostInteraction
             postId={post.id}
             userId={userId}
-            initialLikes={post.likes.map((like: any) => like.userId)}
+            initialLikes={post.likes.map((like) => like.userId)}
             commentNumber={post._count.replies}
           />
         </div>

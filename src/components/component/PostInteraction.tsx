@@ -40,9 +40,15 @@ const PostInteraction = ({ postId, userId, initialLikes, commentNumber }: PostIn
     <div className="flex items-center">
       <form action={handleLikeSubmit} className="flex items-center">
         <Button variant="ghost" size="icon">
-          <HeartIcon className="h-5 w-5 text-muted-foreground" />
+          <HeartIcon
+            className={`h-5 w-5 ${optimisticLike.isLiked ? 'text-destructive' : 'text-muted-foreground'}`}
+          />
         </Button>
-        <span className="-ml-1 text-sm">{optimisticLike.likeCount}</span>
+        <span
+          className={`-ml-1 text-sm ${optimisticLike.isLiked ? 'text-destructive' : 'text-muted-foreground'}`}
+        >
+          {optimisticLike.likeCount}
+        </span>
         <Button variant="ghost" size="icon">
           <MessageCircleIcon className="h-5 w-5 text-muted-foreground" />
         </Button>
