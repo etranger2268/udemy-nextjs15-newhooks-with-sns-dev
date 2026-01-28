@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
+import Link from 'next/link';
 import { ClockIcon } from '@/components/component/Icons';
 import PostInteraction from '@/components/component/PostInteraction';
 
@@ -35,7 +36,9 @@ const Post = ({ post, userId }: PostProps) => {
     <div key={post.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
       <div className="flex items-center gap-4 mb-4">
         <Avatar className="w-10 h-10">
-          <AvatarImage src={post.author?.image ?? '/placeholder-user.jpg'} />
+          <Link href={post.author.id ? `/profile/${post.author.id}` : '#'}>
+            <AvatarImage src={post.author?.image ?? '/placeholder-user.jpg'} />
+          </Link>
           <AvatarFallback>AC</AvatarFallback>
         </Avatar>
         <div>
