@@ -1,28 +1,48 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useOptimistic } from 'react';
 import { HeartIcon, MessageCircleIcon, Share2Icon } from '@/components/component/Icons';
 import { Button } from '@/components/ui/button';
 import { likeAction } from '@/lib/likeAction';
 
 type PostInteractionProps = {
   postId: string;
+  userId: string;
   initialLikes: string[];
   commentNumber: number;
 };
 
-const PostInteraction = ({ postId, initialLikes, commentNumber }: PostInteractionProps) => {
-  const likeActionWithPostId = likeAction.bind(null, postId);
-  const initialState = { error: '', success: true };
-  const [state, formAction] = useActionState(likeActionWithPostId, initialState);
+type LikeStateProps = {
+  likeCount: number;
+  isLiked: boolean;
+};
+
+const PostInteraction = ({ postId, userId, initialLikes, commentNumber }: PostInteractionProps) => {
+  const initialState: LikeStateProps = {
+    likeCount: initialLikes.length,
+    isLiked: initialLikes.includes(userId),
+  };
+
+  const [optimisticLike, addOptimisticLike] = useOptimistic<LikeStateProps, void>(
+    initialState,
+    (currentState) => ({
+      likeCount: currentState.isLiked ? currentState.likeCount - 1 : currentState.likeCount + 1,
+      isLiked: !currentState.isLiked,
+    }),
+  );
+
+  const handleLikeSubmit = async () => {
+    addOptimisticLike();
+    await likeAction(postId);
+  };
 
   return (
     <div className="flex items-center">
-      <form action={formAction} className="flex items-center">
+      <form action={handleLikeSubmit} className="flex items-center">
         <Button variant="ghost" size="icon">
           <HeartIcon className="h-5 w-5 text-muted-foreground" />
         </Button>
-        <span className="-ml-1 text-sm">{initialLikes.length}</span>
+        <span className="-ml-1 text-sm">{optimisticLike.likeCount}</span>
         <Button variant="ghost" size="icon">
           <MessageCircleIcon className="h-5 w-5 text-muted-foreground" />
         </Button>
@@ -31,7 +51,6 @@ const PostInteraction = ({ postId, initialLikes, commentNumber }: PostInteractio
           <Share2Icon className="h-5 w-5 text-muted-foreground" />
         </Button>
       </form>
-      {state.error && !state.success && <p className="text-red-500 mt-1 ml-2">{state.error}</p>}
     </div>
   );
 };

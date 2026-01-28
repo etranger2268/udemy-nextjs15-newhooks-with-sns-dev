@@ -4,17 +4,12 @@ import { auth } from '@clerk/nextjs/server';
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 
-type State = {
-  error: string;
-  success: boolean;
-};
-
-export const likeAction = async (postId: string, prevState: State) => {
+export const likeAction = async (postId: string) => {
   await new Promise((resolve) => setTimeout(resolve, 2000));
   const { userId: clerkId } = await auth();
 
   if (!clerkId) {
-    return { ...prevState, error: 'Need to Sign in', success: false };
+    throw new Error('Need to Sign in');
   }
 
   const dbUser = await prisma.user.findUnique({
@@ -23,7 +18,7 @@ export const likeAction = async (postId: string, prevState: State) => {
   });
 
   if (!dbUser) {
-    return { ...prevState, error: 'User data not found', success: false };
+    throw new Error('User data not found');
   }
 
   try {
@@ -53,9 +48,9 @@ export const likeAction = async (postId: string, prevState: State) => {
     }
 
     revalidatePath('/');
-    return { ...prevState, error: '', success: true };
+    return;
   } catch (error) {
     console.error('Like Action Error:', error);
-    return { ...prevState, error: 'Unexpected Error', success: false };
+    return;
   }
 };

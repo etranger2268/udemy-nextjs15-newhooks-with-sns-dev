@@ -2,7 +2,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 import { ClockIcon } from '@/components/component/Icons';
 import PostInteraction from '@/components/component/PostInteraction';
 
-const Post = ({ post }: any) => {
+type PostProps = {
+  post: any;
+  userId: string;
+};
+
+const Post = ({ post, userId }: PostProps) => {
   return (
     <div key={post.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
       <div className="flex items-center gap-4 mb-4">
@@ -22,6 +27,7 @@ const Post = ({ post }: any) => {
         <div className="flex items-center gap-2">
           <PostInteraction
             postId={post.id}
+            userId={userId}
             initialLikes={post.likes.map((like: any) => like.userId)}
             commentNumber={post._count.replies}
           />
