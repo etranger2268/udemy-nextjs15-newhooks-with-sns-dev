@@ -1,13 +1,17 @@
-import type { Prisma } from 'generated/prisma/client';
 import { prisma } from '@/lib/prisma';
 
-type PostUser = Prisma.UserGetPayload<Record<string, never>>;
+export const postDataFetcher = async (userId: string) => {
+  const following = await prisma.follow.findMany({
+    where: { followerId: userId },
+    select: { followingId: true },
+  });
 
-export const postDataFetcher = async (user: PostUser) =>
-  await prisma.post.findMany({
+  const followingIds = following.map((f) => f.followingId);
+
+  return await prisma.post.findMany({
     where: {
       authorId: {
-        in: [user.id],
+        in: [userId, ...followingIds],
       },
     },
     include: {
@@ -27,3 +31,4 @@ export const postDataFetcher = async (user: PostUser) =>
       createdAt: 'desc',
     },
   });
+};

@@ -29,7 +29,7 @@ async function PostListContent() {
     );
   }
 
-  const posts = await postDataFetcher(user);
+  const posts = await postDataFetcher(user.id);
 
   if (posts.length === 0) {
     return <p className="text-sm font-medium text-center text-gray-500">ポストが存在しません。</p>;
