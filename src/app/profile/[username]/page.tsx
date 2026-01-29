@@ -1,12 +1,13 @@
 import { notFound } from 'next/navigation';
 import { type ComponentPropsWithoutRef, Suspense } from 'react';
+import PostList from '@/components/component/PostList';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { prisma } from '@/lib/prisma';
 
 type ProfilePageProps = {
   params: Promise<{
-    username: string;
+    username: string | undefined;
   }>;
 };
 
@@ -53,7 +54,7 @@ async function ProfilePageContent({ params }: ProfilePageProps) {
           </Avatar>
           <div>
             <h1 className="text-3xl font-bold">{user.username}</h1>
-            <div className="text-muted-foreground">{user.id}</div>
+            <div className="text-muted-foreground">@{user.id}</div>
           </div>
         </div>
 
@@ -82,7 +83,9 @@ async function ProfilePageContent({ params }: ProfilePageProps) {
           </div>
         </div>
 
-        <div className="mt-6 h-125 overflow-y-auto">Time Line Here</div>
+        <div className="mt-6 h-125 overflow-y-auto">
+          <PostList username={username} />
+        </div>
       </div>
       <div className="sticky top-14 self-start space-y-6">
         <Button className="w-full">Follow</Button>

@@ -6,7 +6,7 @@ export default function MainContent() {
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 space-y-6 flex flex-col h-full overflow-hidden">
       <PostForm />
       <div className="overflow-y-scroll">
-        <PostList />
+        <PostList username={undefined} />
       </div>
     </div>
   );
