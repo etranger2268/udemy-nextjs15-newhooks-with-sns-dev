@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { type ComponentPropsWithoutRef, Suspense } from 'react';
+import FollowButton from '@/components/component/FollowButton';
 import PostList from '@/components/component/PostList';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -37,12 +38,20 @@ async function ProfilePageContent({ params }: ProfilePageProps) {
           posts: true,
         },
       },
+      following: {
+        where: {
+          followerId: username,
+        },
+      },
     },
   });
 
   if (!user) {
     notFound();
   }
+
+  const isCurrentUser = username === user.id;
+  const isFollowing = user.following.length > 0;
 
   return (
     <div className="grid gap-6 md:grid-cols-[1fr_300px]">
@@ -88,7 +97,7 @@ async function ProfilePageContent({ params }: ProfilePageProps) {
         </div>
       </div>
       <div className="sticky top-14 self-start space-y-6">
-        <Button className="w-full">Follow</Button>
+        <FollowButton />
         <div>
           <h3 className="text-lg font-bold">Suggested</h3>
           <div className="mt-4 space-y-4">
