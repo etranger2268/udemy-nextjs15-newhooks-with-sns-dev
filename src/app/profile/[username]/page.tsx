@@ -1,102 +1,136 @@
-import type { ComponentPropsWithoutRef } from 'react';
+import { notFound } from 'next/navigation';
+import { type ComponentPropsWithoutRef, Suspense } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { prisma } from '@/lib/prisma';
 
-export default function ProfilePage() {
+type ProfilePageProps = {
+  params: Promise<{
+    username: string;
+  }>;
+};
+
+export default function ProfilePage({ params }: ProfilePageProps) {
   return (
     <div className="flex flex-col min-h-dvh">
       <main className="flex-1">
         <div className="container py-6 md:py-10 lg:py-12 mx-auto">
-          <div className="grid gap-6 md:grid-cols-[1fr_300px]">
-            <div>
-              <div className="flex items-center gap-6">
-                <Avatar className="w-24 h-24 mb-4 md:mb-0">
-                  <AvatarImage src={'/placeholder-user.jpg'} alt="Acme Inc Profile" />
-                  <AvatarFallback>AI</AvatarFallback>
-                </Avatar>
-                <div>
-                  <h1 className="text-3xl font-bold">SampleUser</h1>
-                  <div className="text-muted-foreground">@SampleUser</div>
-                </div>
-              </div>
+          <Suspense fallback={<p>Loading...</p>}>
+            <ProfilePageContent params={params} />
+          </Suspense>
+        </div>
+      </main>
+    </div>
+  );
+}
 
-              <div className="mt-4 flex items-center gap-4 text-muted-foreground">
-                <div>
-                  <MapPinIcon className="w-4 h-4 mr-1 inline" />
-                  xxxxxxxxx
-                </div>
-                <div>
-                  <LinkIcon className="w-4 h-4 mr-1 inline" />
-                  xxxxxx.com
-                </div>
-              </div>
-              <div className="mt-6 flex items-center gap-6">
-                <div className="flex flex-col items-center">
-                  <div className="text-2xl font-bold">10</div>
-                  <div className="text-muted-foreground">Posts</div>
-                </div>
-                <div className="flex flex-col items-center">
-                  <div className="text-2xl font-bold">300</div>
-                  <div className="text-muted-foreground">Followers</div>
-                </div>
-                <div className="flex flex-col items-center">
-                  <div className="text-2xl font-bold">100</div>
-                  <div className="text-muted-foreground">Following</div>
-                </div>
-              </div>
+async function ProfilePageContent({ params }: ProfilePageProps) {
+  const { username } = await params;
+  const user = await prisma.user.findUnique({
+    where: { id: username },
+    include: {
+      _count: {
+        select: {
+          followedBy: true,
+          following: true,
+          posts: true,
+        },
+      },
+    },
+  });
 
-              <div className="mt-6 h-125 overflow-y-auto">Time Line Here</div>
-            </div>
-            <div className="sticky top-14 self-start space-y-6">
-              <Button className="w-full">Follow</Button>
+  if (!user) {
+    notFound();
+  }
+
+  return (
+    <div className="grid gap-6 md:grid-cols-[1fr_300px]">
+      <div>
+        <div className="flex items-center gap-6">
+          <Avatar className="w-24 h-24 mb-4 md:mb-0">
+            <AvatarImage src={user.image ?? '/placeholder-user.jpg'} alt="Acme Inc Profile" />
+            <AvatarFallback>AI</AvatarFallback>
+          </Avatar>
+          <div>
+            <h1 className="text-3xl font-bold">{user.username}</h1>
+            <div className="text-muted-foreground">{user.id}</div>
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center gap-4 text-muted-foreground">
+          <div>
+            <MapPinIcon className="w-4 h-4 mr-1 inline" />
+            xxxxxxxxx
+          </div>
+          <div>
+            <LinkIcon className="w-4 h-4 mr-1 inline" />
+            xxxxxx.com
+          </div>
+        </div>
+        <div className="mt-6 flex items-center gap-6">
+          <div className="flex flex-col items-center">
+            <div className="text-2xl font-bold">{user._count.posts}</div>
+            <div className="text-muted-foreground">Posts</div>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="text-2xl font-bold">{user._count.followedBy}</div>
+            <div className="text-muted-foreground">Followers</div>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="text-2xl font-bold">{user._count.following}</div>
+            <div className="text-muted-foreground">Following</div>
+          </div>
+        </div>
+
+        <div className="mt-6 h-125 overflow-y-auto">Time Line Here</div>
+      </div>
+      <div className="sticky top-14 self-start space-y-6">
+        <Button className="w-full">Follow</Button>
+        <div>
+          <h3 className="text-lg font-bold">Suggested</h3>
+          <div className="mt-4 space-y-4">
+            <div className="flex items-center gap-3">
+              <Avatar className="w-10 h-10">
+                <AvatarImage src="/placeholder-user.jpg" />
+                <AvatarFallback>AC</AvatarFallback>
+              </Avatar>
               <div>
-                <h3 className="text-lg font-bold">Suggested</h3>
-                <div className="mt-4 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="w-10 h-10">
-                      <AvatarImage src="/placeholder-user.jpg" />
-                      <AvatarFallback>AC</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div className="font-medium">Acme Inc</div>
-                      <div className="text-muted-foreground text-sm">@acmeinc</div>
-                    </div>
-                    <Button variant="ghost" size="icon" className="ml-auto">
-                      <PlusIcon className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Avatar className="w-10 h-10">
-                      <AvatarImage src="/placeholder-user.jpg" />
-                      <AvatarFallback>AC</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div className="font-medium">Acme Inc</div>
-                      <div className="text-muted-foreground text-sm">@acmeinc</div>
-                    </div>
-                    <Button variant="ghost" size="icon" className="ml-auto">
-                      <PlusIcon className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Avatar className="w-10 h-10">
-                      <AvatarImage src="/placeholder-user.jpg" />
-                      <AvatarFallback>AC</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div className="font-medium">Acme Inc</div>
-                      <div className="text-muted-foreground text-sm">@acmeinc</div>
-                    </div>
-                    <Button variant="ghost" size="icon" className="ml-auto">
-                      <PlusIcon className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
+                <div className="font-medium">Acme Inc</div>
+                <div className="text-muted-foreground text-sm">@acmeinc</div>
               </div>
+              <Button variant="ghost" size="icon" className="ml-auto">
+                <PlusIcon className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="flex items-center gap-3">
+              <Avatar className="w-10 h-10">
+                <AvatarImage src="/placeholder-user.jpg" />
+                <AvatarFallback>AC</AvatarFallback>
+              </Avatar>
+              <div>
+                <div className="font-medium">Acme Inc</div>
+                <div className="text-muted-foreground text-sm">@acmeinc</div>
+              </div>
+              <Button variant="ghost" size="icon" className="ml-auto">
+                <PlusIcon className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="flex items-center gap-3">
+              <Avatar className="w-10 h-10">
+                <AvatarImage src="/placeholder-user.jpg" />
+                <AvatarFallback>AC</AvatarFallback>
+              </Avatar>
+              <div>
+                <div className="font-medium">Acme Inc</div>
+                <div className="text-muted-foreground text-sm">@acmeinc</div>
+              </div>
+              <Button variant="ghost" size="icon" className="ml-auto">
+                <PlusIcon className="w-4 h-4" />
+              </Button>
             </div>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
