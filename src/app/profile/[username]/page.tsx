@@ -1,9 +1,11 @@
+import { auth } from '@clerk/nextjs/server';
 import { notFound } from 'next/navigation';
 import { type ComponentPropsWithoutRef, Suspense } from 'react';
 import FollowButton from '@/components/component/FollowButton';
 import PostList from '@/components/component/PostList';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { postUserFetcher } from '@/lib/postUserFetcher';
 import { prisma } from '@/lib/prisma';
 
 type ProfilePageProps = {
@@ -28,6 +30,21 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 
 async function ProfilePageContent({ params }: ProfilePageProps) {
   const { username } = await params;
+
+  const { userId: clerkId } = await auth();
+
+  if (!clerkId) {
+    return <p className="text-sm font-medium text-center text-gray-500">ログインしてください</p>;
+  }
+
+  const currentUser = await postUserFetcher(clerkId);
+
+  if (!currentUser) {
+    return (
+      <p className="text-sm font-medium text-center text-gray-500">ユーザーがDBに存在しません</p>
+    );
+  }
+
   const user = await prisma.user.findUnique({
     where: { id: username },
     include: {
@@ -38,11 +55,6 @@ async function ProfilePageContent({ params }: ProfilePageProps) {
           posts: true,
         },
       },
-      following: {
-        where: {
-          followerId: username,
-        },
-      },
     },
   });
 
@@ -50,8 +62,13 @@ async function ProfilePageContent({ params }: ProfilePageProps) {
     notFound();
   }
 
-  const isCurrentUser = username === user.id;
-  const isFollowing = user.following.length > 0;
+  const isCurrentUser = currentUser.id === user.id;
+  const isFollowing =
+    (await prisma.follow.count({
+      where: { followerId: currentUser.id, followingId: user.id },
+    })) > 0;
+
+  console.log(isFollowing);
 
   return (
     <div className="grid gap-6 md:grid-cols-[1fr_300px]">
@@ -97,7 +114,7 @@ async function ProfilePageContent({ params }: ProfilePageProps) {
         </div>
       </div>
       <div className="sticky top-14 self-start space-y-6">
-        <FollowButton />
+        <FollowButton isCurrentUser={isCurrentUser} isFollowing={isFollowing} />
         <div>
           <h3 className="text-lg font-bold">Suggested</h3>
           <div className="mt-4 space-y-4">
