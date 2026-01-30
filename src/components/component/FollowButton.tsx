@@ -36,6 +36,10 @@ const FollowButton = ({ displayUserId, isCurrentUser, isFollowing }: FollowButto
       : 'default';
 
   const handleFollowAction = async () => {
+    if (isCurrentUser) {
+      return;
+    }
+
     try {
       addOptimisticFollow();
       followAction(displayUserId);

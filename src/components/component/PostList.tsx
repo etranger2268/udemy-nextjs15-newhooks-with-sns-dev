@@ -5,7 +5,7 @@ import { postDataFetcher } from '@/lib/postDataFetcher';
 import { userFetcher } from '@/lib/userFetcher';
 
 type PostListProps = {
-  username: string | undefined;
+  username?: string;
 };
 
 export default async function PostList({ username }: PostListProps) {
