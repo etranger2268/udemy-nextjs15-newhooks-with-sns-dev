@@ -1,6 +1,7 @@
 'use server';
 
 import { auth } from '@clerk/nextjs/server';
+import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { userFetcher } from '@/lib/userFetcher';
 
@@ -25,6 +26,25 @@ export const followAction = async (displayUserId: string) => {
       },
     });
 
+    if (existingFollow) {
+      await prisma.follow.delete({
+        where: {
+          followerId_followingId: {
+            followerId: user.id,
+            followingId: displayUserId,
+          },
+        },
+      });
+    } else {
+      await prisma.follow.create({
+        data: {
+          followerId: user.id,
+          followingId: displayUserId,
+        },
+      });
+    }
+
+    revalidatePath(`/profile/${displayUserId}`);
     return;
   } catch (error) {
     console.error('Follow Action Error:', error);
