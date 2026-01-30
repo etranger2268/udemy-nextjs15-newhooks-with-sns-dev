@@ -2,7 +2,7 @@ import { auth } from '@clerk/nextjs/server';
 import { Suspense } from 'react';
 import Post from '@/components/component/Post';
 import { postDataFetcher } from '@/lib/postDataFetcher';
-import { postUserFetcher } from '@/lib/postUserFetcher';
+import { userFetcher } from '@/lib/userFetcher';
 
 type PostListProps = {
   username: string | undefined;
@@ -25,7 +25,7 @@ async function PostListContent({ username }: PostListProps) {
     return <p className="text-sm font-medium text-center text-gray-500">ログインしてください</p>;
   }
 
-  const user = await postUserFetcher(clerkId);
+  const user = await userFetcher(clerkId);
 
   if (!user) {
     return (

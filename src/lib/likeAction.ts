@@ -3,6 +3,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
+import { userFetcher } from '@/lib/userFetcher';
 
 export const likeAction = async (postId: string) => {
   await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -12,12 +13,9 @@ export const likeAction = async (postId: string) => {
     throw new Error('Need to Sign in');
   }
 
-  const dbUser = await prisma.user.findUnique({
-    where: { clerkId: clerkId },
-    select: { id: true },
-  });
+  const user = await userFetcher(clerkId);
 
-  if (!dbUser) {
+  if (!user) {
     throw new Error('User data not found');
   }
 
@@ -25,7 +23,7 @@ export const likeAction = async (postId: string) => {
     const existingLike = await prisma.like.findFirst({
       where: {
         postId,
-        userId: dbUser.id,
+        userId: user.id,
       },
       select: {
         id: true,
@@ -42,7 +40,7 @@ export const likeAction = async (postId: string) => {
       await prisma.like.create({
         data: {
           postId,
-          userId: dbUser.id,
+          userId: user.id,
         },
       });
     }

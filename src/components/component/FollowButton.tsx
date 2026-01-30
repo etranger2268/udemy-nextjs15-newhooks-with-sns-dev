@@ -1,18 +1,21 @@
 import { Button } from '@/components/ui/button';
+import { followAction } from '@/lib/followAction';
 
 type FollowButton = {
+  displayUserId: string;
   isCurrentUser: boolean;
   isFollowing: boolean;
 };
 
-const FollowButton = ({ isCurrentUser, isFollowing }: FollowButton) => {
-  console.log();
+const FollowButton = ({ displayUserId, isCurrentUser, isFollowing }: FollowButton) => {
   const text = isCurrentUser ? 'Edit Profile' : isFollowing ? 'Unfollow' : 'Follow';
   const variant = isCurrentUser ? 'secondary' : isFollowing ? 'outline' : 'default';
   return (
-    <Button variant={variant} className="w-full">
-      {text}
-    </Button>
+    <form action={followAction.bind(null, displayUserId)}>
+      <Button variant={variant} className="w-full">
+        {text}
+      </Button>
+    </form>
   );
 };
 

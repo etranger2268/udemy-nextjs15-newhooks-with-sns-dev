@@ -5,8 +5,8 @@ import FollowButton from '@/components/component/FollowButton';
 import PostList from '@/components/component/PostList';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { postUserFetcher } from '@/lib/postUserFetcher';
 import { prisma } from '@/lib/prisma';
+import { userFetcher } from '@/lib/userFetcher';
 
 type ProfilePageProps = {
   params: Promise<{
@@ -31,13 +31,17 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 async function ProfilePageContent({ params }: ProfilePageProps) {
   const { username } = await params;
 
+  if (!username) {
+    notFound();
+  }
+
   const { userId: clerkId } = await auth();
 
   if (!clerkId) {
     return <p className="text-sm font-medium text-center text-gray-500">ログインしてください</p>;
   }
 
-  const currentUser = await postUserFetcher(clerkId);
+  const currentUser = await userFetcher(clerkId);
 
   if (!currentUser) {
     return (
@@ -114,7 +118,11 @@ async function ProfilePageContent({ params }: ProfilePageProps) {
         </div>
       </div>
       <div className="sticky top-14 self-start space-y-6">
-        <FollowButton isCurrentUser={isCurrentUser} isFollowing={isFollowing} />
+        <FollowButton
+          displayUserId={username}
+          isCurrentUser={isCurrentUser}
+          isFollowing={isFollowing}
+        />
         <div>
           <h3 className="text-lg font-bold">Suggested</h3>
           <div className="mt-4 space-y-4">
